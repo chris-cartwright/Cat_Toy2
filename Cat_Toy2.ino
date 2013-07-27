@@ -174,6 +174,8 @@ void adjust_deg(sweep& servo, char key_low, char key_high, boolean useHigh)
         
       servo.move_to(a);
     }
+    
+    delay(50);
   }
 }
 
@@ -188,28 +190,28 @@ void adjust()
   PRINTLN(key);
   switch(key)
   {
-  case '2':
-    h_servo.to_middle();
-    v_servo.to_high();
-    adjust_deg(v_servo, '2', '8', true);
-    break;
-    
   case '8':
     h_servo.to_middle();
+    v_servo.to_high();
+    adjust_deg(v_servo, '8', '2', true);
+    break;
+    
+  case '2':
+    h_servo.to_middle();
     v_servo.to_low();
-    adjust_deg(v_servo, '2', '8', false);
+    adjust_deg(v_servo, '8', '2', false);
     break;
     
   case '4':
     v_servo.to_middle();
     h_servo.to_low();
-    adjust_deg(h_servo, '4', '6', false);
+    adjust_deg(h_servo, '6', '4', false);
     break;
     
   case '6':
     v_servo.to_middle();
     h_servo.to_high();
-    adjust_deg(h_servo, '4', '6', true);
+    adjust_deg(h_servo, '6', '4', true);
     break;
     
   case '5':

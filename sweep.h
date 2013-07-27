@@ -46,7 +46,7 @@ public:
   
   void new_target()
   {
-    _target = random(min(_low, _high), max(_low, _high));
+    _target = random(_low, _high);
     if(_target > _current)
       _dir = HIGH;
     else
