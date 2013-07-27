@@ -46,7 +46,7 @@ public:
   
   void new_target()
   {
-    _target = random(_low, _high);
+    _target = random(min(_low, _high), max(_low, _high));
     if(_target > _current)
       _dir = HIGH;
     else
@@ -96,6 +96,16 @@ public:
     _current = deg;
   }
   
+  void inc()
+  {
+    move_to(_current + _speed);
+  }
+  
+  void dec()
+  {
+    move_to(_current - _speed);
+  }
+  
   void to_low()
   {
     move_to(_low);
@@ -118,32 +128,3 @@ public:
     _cont = enable;
   }
 };
-
-/*
-class getset
-{
-protected:
-  sweep *_servo;
-  
-public:
-  getset(sweep *servo) : _servo(servo) { }
-  virtual void operator()(int) = 0;
-  virtual int operator()() = 0;
-};
-
-class getset_high : public getset
-{
-public:
-  getset_high(sweep *servo) : getset(servo) { }
-  void operator()(int a) { _servo->high(a); }
-  int operator()() { return _servo->high(); }
-};
-
-class getset_low : public getset
-{
-public:
-  getset_low(sweep *servo) : getset(servo) { }
-  void operator()(int a) { _servo->low(a); }
-  int operator()() { return _servo->low(); }
-};
-*/

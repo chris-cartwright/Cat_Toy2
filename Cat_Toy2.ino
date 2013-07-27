@@ -20,7 +20,6 @@
 class pins
 {
 public:
-  static const int off = 13;
   static const int power = 11;
   static const int laser = 12;
   static const int v_servo = 9;
@@ -35,7 +34,6 @@ public:
   
   static void setup()
   {
-    pinMode(off, OUTPUT);
     pinMode(power, OUTPUT);
     pinMode(laser, OUTPUT);
     pinMode(v_servo, OUTPUT);
@@ -54,15 +52,17 @@ char keymap[4][3] = {
 };
 
 Keypad keypad = Keypad(makeKeymap(keymap), pins::keypad::rows, pins::keypad::columns, 4, 3);
-sweep v_servo(pins::v_servo, 45, 0);
+sweep v_servo(pins::v_servo, 0, 45);
 sweep h_servo(pins::h_servo);
 int speed = 500;
 long cont = 0;
 
 void setup()
 {
-  Serial.begin(9600);
-  
+#ifdef DEBUG
+  Serial.begin(115200);
+#endif
+
   pins::setup();
   
   v_servo.attach();
@@ -73,17 +73,12 @@ void setup()
   
   // Should be a random value on pretty much any analog pin
   randomSeed(analogRead(5));
-  
-#ifdef DEBUG
-  Serial.begin(9600);
-#endif
 
   PRINT("Speed: ");
   PRINTLN(speed);
   
   cont = millis();
   
-  keypad.addEventListener(shutdownCheck);
   keypad.setHoldTime(3000);
 }
 
@@ -104,6 +99,14 @@ void loop()
     keypad.getKey();
     digitalWrite(pins::power, LOW);
     adjust();
+    digitalWrite(pins::power, HIGH);
+  }
+  
+  if(keypad.isPressed('0'))
+  {
+    keypad.getKey();
+    digitalWrite(pins::power, LOW);
+    manual();
     digitalWrite(pins::power, HIGH);
   }
   
@@ -253,16 +256,50 @@ void adjust()
   }
 }
 
-void shutdownCheck(char key)
+void manual()
 {
-  if(keypad.getState() != HOLD)
-    return;
+  PRINTLN("Manual Control");
+  h_servo.to_middle();
+  v_servo.to_middle();
+  
+  // Make it more user friendly
+  delay(1000);
+  
+  while(!keypad.isPressed('#'))
+  { 
+    if(keypad.isPressed('2'))
+    {
+      v_servo.dec();
+      PRINT("Vertical up: ");
+      PRINTLN(v_servo.current());
+    }
     
-  if(key != '0')
-    return;
+    if(keypad.isPressed('8'))
+    {
+      v_servo.inc();
+      PRINT("Vertical down: ");
+      PRINTLN(v_servo.current());
+    }
     
-  PRINTLN("Shutdown detected.");
-  // Write to EEPROM
-  digitalWrite(pins::off, HIGH);
+    if(keypad.isPressed('4'))
+    {
+      h_servo.dec();
+      PRINT("Horizontal left: ");
+      PRINTLN(h_servo.current());
+    }
+    
+    if(keypad.isPressed('6'))
+    {
+      h_servo.inc();
+      PRINT("Horizontal right: ");
+      PRINTLN(h_servo.current());
+    }
+    
+    keypad.getKeys();
+    delay(50);
+  }
+  
+  v_servo.to_middle();
+  h_servo.to_middle();
 }
 
